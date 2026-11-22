@@ -42,16 +42,18 @@ export function stageShot(name) {
     state.winner = 'enemy';
     return state;
   }
-  // table — Shot 1 cover (§6 Pilihan C, setelah kartu ketiga dimainkan).
+  // table — Shot 1 cover (§6 Pilihan C, setelah kartu ketiga dimainkan, v2).
+  // v2: Putaran 6 (bukan 4 — dengan nyawa 50, lawan baru turun ke 6 di putaran 6),
+  // koin 2 dari 5 (basis 4 + Koin Receh +1, sudah dipakai Obor 1 + Sate 2).
   state.phase = 'player';
-  state.round = 4;
+  state.round = 6;
   state.player.life = 22;
   state.player.shield = 0;
-  state.player.coins = 3;
-  state.player.coinsMax = 7;
+  state.player.coins = 2;
+  state.player.coinsMax = 5;
   state.player.hand = [inst('obor'), inst('sate'), inst('daun-pisang'), inst('ikan'), inst('koin-receh')];
-  state.player.deck = fillPile(24, 'obor');
-  state.player.discard = fillPile(7, 'daun-pisang');
+  state.player.deck = fillPile(17, 'obor');
+  state.player.discard = fillPile(9, 'daun-pisang');
   state.player.played = [{ card: inst('koin-receh'), cost: 0 }, { card: inst('obor'), cost: 1 }, { card: inst('sate'), cost: 2 }];
   state.enemy.life = 6;
   state.enemy.shield = 0;
@@ -67,7 +69,7 @@ export function stageShot(name) {
     icon: '🔥', color: '#E8442E', bg: '#5A1410',
     note: 'Perkiraan — bisa meleset 2',
   };
-  state.stars = 2;
+  state.stars = 3; // Reputasi 22 >= 20 -> 3 bintang (rumus starsFor).
   state.selectedIndex = 1;
   state.log = ['Sate Membara menyerang 11 — Roda Senja mengalahkan Daun'];
   return state;

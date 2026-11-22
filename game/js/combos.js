@@ -13,7 +13,7 @@ export function resonanceBonus(suit) {
     case 'lampion': return { label: 'RESONANSI LAMPION! +2 SERANG', dmg: 2 };
     case 'ombak': return { label: 'RESONANSI OMBAK! +1 DRAW', draw: 1 };
     case 'daun': return { label: 'RESONANSI DAUN! +3 PERISAI', shield: 3 };
-    case 'bulan': return { label: 'RESONANSI BULAN! +2 KOIN', refund: 2 };
+    case 'bulan': return { label: 'RESONANSI BULAN! +1 KOIN', refund: 1 };
     default: return { label: '' };
   }
 }

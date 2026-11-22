@@ -3,9 +3,9 @@
 
 import { buildDeck } from './deck.js';
 
-export const MAX_LIFE = 30;
+export const MAX_LIFE = 50;
 export const MAX_HAND = 8;
-export const BASE_COINS = 5;
+export const BASE_COINS = 4;
 
 export function freshSide() {
   return {

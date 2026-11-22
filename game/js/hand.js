@@ -2,6 +2,7 @@
 // Bekerja di atas state.js / combos.js / deck.js. Tanpa DOM.
 
 import { computeBonuses } from './combos.js';
+import { BASE_COINS } from './state.js';
 import { drawFromDeck, discardRandom } from './deck.js';
 import { applyDamageTo, healSide, senjaTerakhirActive, MAX_HAND, addLog } from './state.js';
 
@@ -21,7 +22,7 @@ export function startTurn(state, sideName) {
     me.life = Math.max(0, me.life - burn);
     messages.push('Bara membakar ' + (sideName === 'player' ? 'Sari' : 'Juragan Bara') + ' −' + burn);
   }
-  me.coinsMax = 5 + (senjaTerakhirActive(me) ? 1 : 0);
+  me.coinsMax = BASE_COINS + (senjaTerakhirActive(me) ? 1 : 0);
   me.coins = me.coinsMax + me.coinsNext;
   me.coinsNext = 0;
   me.played = [];
@@ -92,12 +93,12 @@ export function playCard(state, sideName, uid) {
     events.push({ type: 'damage', amount: res.dealt, absorbed: res.absorbed, target: foeName, pierce: bonuses.pierce });
     state.floating = { text: '−' + res.dealt, target: foeName };
     if (card.special === 'juragan' && shieldBefore > 0) {
-      me.coins += 3;
-      messages.push('Juragan Datang: terpal dihancurkan, +3 koin');
+      me.coins += 2;
+      messages.push('Juragan Datang: terpal dihancurkan, +2 koin');
     }
     if (card.special === 'lelang' && foe.life <= 10 && foe.life > 0) {
-      me.coins += 3;
-      messages.push('Lelang Kilat: lawan sekarat, +3 koin');
+      me.coins += 2;
+      messages.push('Lelang Kilat: lawan sekarat, +2 koin');
     }
     me.firstAttackDone = true;
   }

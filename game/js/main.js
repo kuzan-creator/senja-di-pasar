@@ -128,7 +128,7 @@ function runEnemyTurn() {
   if (!plan) {
     plan = planTurn(state.enemy, state.player, state.round);
   }
-  const queue = plan.cards.slice(0, 3);
+  const queue = plan.cards.slice(0, 6); // v2: rencana AI hasil simulasi bisa sampai 6 kartu (ekonomi + inti); potongan 3 kartu v1 membuang rencana itu.
   let i = 0;
   show();
   const step = () => {
