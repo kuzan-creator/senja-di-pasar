@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Senja di Pasar — Duel Lapak Terakhir</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E%F0%9F%8C%99%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="stage">
+
+  <!-- Layar 1 — Title screen -->
+  <section id="screen-title" class="screen">
+    <div class="title-sky"></div>
+    <div class="title-lanterns" aria-hidden="true"><span>🏮</span><span>🏮</span><span>🏮</span><span>🏮</span><span>🏮</span></div>
+    <h1 class="game-title">SENJA DI PASAR</h1>
+    <p class="game-subtitle">Duel Lapak Terakhir — The Last Stall Duel</p>
+    <p class="game-tagline">“Dua lapak, satu senja. Habiskan Reputasi lawan sebelum lampumu padam.”</p>
+    <button id="btn-start" class="btn btn-gold btn-big">▶ MULAI BERDAGANG</button>
+    <button id="btn-howto" class="btn btn-white">CARA MAIN / HOW TO PLAY</button>
+    <div id="howto-panel" class="howto hidden">
+      <p><b>Tujuan:</b> Habiskan Reputasi Juragan Bara (30) sebelum Reputasimu habis.</p>
+      <p><b>Giliran:</b> 5 Koin Senja per giliran. Klik kartu untuk memilih, klik lagi / Enter untuk memainkan. Spasi = Tutup Lapak.</p>
+      <p><b>Kombo:</b> 2 kartu suit sama = Resonansi • biaya berurutan = Rantai Senja • 3 suit beda = Pasar Ramai • suit mengalahkan suit lawan = Roda Senja +3.</p>
+      <p><b>Intent:</b> baca lencana merah di atas meja — itulah yang akan dilakukan lawan di gilirannya.</p>
+      <p><b>Keyboard:</b> 1–8 pilih kartu • Enter main • Spasi tutup lapak • M bisu • R main lagi.</p>
+    </div>
+    <div id="title-cards" class="title-cards" aria-label="Contoh kartu"></div>
+    <div class="wheel-mini title-wheel">
+      <div class="wheel-title">RODA SENJA</div>
+      <div class="wheel-row"><span>🔥 Lampion &gt; 🌿 Daun</span></div>
+      <div class="wheel-row"><span>🌿 Daun &gt; 🌊 Ombak</span></div>
+      <div class="wheel-row"><span>🌊 Ombak &gt; 🔥 Lampion</span></div>
+      <div class="wheel-row"><span>🌙 Bulan menembus Terpal</span></div>
+    </div>
+    <p class="title-footer">Game kartu original • Offline • Keyboard + Mouse</p>
+  </section>
+
+  <!-- Layar 2 — Meja utama -->
+  <section id="screen-table" class="screen hidden">
+    <div class="table-sky"></div>
+
+    <div id="enemy-info" class="side-info enemy-info">
+      <div class="avatar avatar-enemy">🧔</div>
+      <div class="side-text">
+        <div class="side-name">Juragan Bara</div>
+        <div class="side-stall">Lapak Bara Membara</div>
+        <div class="side-life-row"><span class="side-life">♥ 30</span><span class="side-shield">🛡 0</span></div>
+      </div>
+    </div>
+
+    <div id="enemy-hand" class="enemy-hand"></div>
+    <div id="enemy-hand-count" class="enemy-hand-count">Kartu lawan: 5</div>
+
+    <div id="round-label" class="round-label">PUTARAN 1</div>
+    <div id="turn-label" class="turn-label">GILIRANMU — mainkan kartumu</div>
+
+    <div id="intent-badge" class="intent-badge" style="display:none">
+      <span class="intent-icon">🔥</span>
+      <span class="intent-body">
+        <span class="intent-text">AKAN MENYERANG 8</span>
+        <span class="intent-sub">WILL ATTACK • Perkiraan — bisa meleset 2</span>
+      </span>
+    </div>
+
+    <div class="wheel-mini table-wheel">
+      <div class="wheel-title">RODA SENJA</div>
+      <div class="wheel-row"><span>🔥 &gt; 🌿 &gt; 🌊 &gt; 🔥</span></div>
+      <div class="wheel-row"><span>🌙 menembus Terpal</span></div>
+    </div>
+
+    <div id="center-area" class="center-area">
+      <div id="last-enemy-card" class="center-slot"></div>
+      <div id="played-card" class="center-slot"></div>
+    </div>
+    <div id="combo-banner" class="combo-banner" style="display:none"></div>
+    <div id="floating-damage" class="floating-damage" style="display:none"></div>
+    <div id="log-line" class="log-line"></div>
+
+    <div id="deck-pile" class="pile deck-pile">
+      <div class="pile-cards">🂠</div>
+      <div class="pile-label">KERANJANG</div>
+      <div id="deck-count" class="pile-count">31</div>
+    </div>
+    <div id="discard-pile" class="pile discard-pile">
+      <div class="pile-cards">▤</div>
+      <div class="pile-label">KOTAK SISA</div>
+      <div id="discard-count" class="pile-count">0</div>
+    </div>
+
+    <div id="player-info" class="side-info player-info">
+      <div class="avatar avatar-player">👩</div>
+      <div class="side-text">
+        <div class="side-name">Sari</div>
+        <div class="side-stall">Lapak Sari Senja</div>
+        <div class="side-life-row"><span class="side-life">♥ 30</span><span class="side-shield">🛡 0</span></div>
+        <div id="player-stars" class="player-stars">★★★</div>
+      </div>
+    </div>
+    <div id="senja-badge" class="senja-badge" style="display:none">🌇 SENJA TERAKHIR +1 KOIN, +2 SERANG</div>
+
+    <div id="coins-box" class="coins-box">
+      <div id="coins-value" class="coins-value">🪙 5</div>
+      <div id="coins-max" class="coins-label">dari 5 Koin Senja</div>
+    </div>
+
+    <div id="player-hand" class="player-hand"></div>
+    <button id="btn-end-turn" class="btn btn-gold btn-end-turn">TUTUP LAPAK ⏎</button>
+  </section>
+
+  <!-- Layar 3 — Menang -->
+  <section id="screen-win" class="screen hidden">
+    <div class="win-sky"></div>
+    <div id="win-fireworks" class="fireworks" aria-hidden="true">
+      <span class="fw f1">✦</span><span class="fw f2">✦</span><span class="fw f3">✦</span>
+      <span class="fw f4">✦</span><span class="fw f5">✦</span><span class="fw f6">✦</span>
+    </div>
+    <h1 class="end-title win-title">LAPAKMU MENANG!</h1>
+    <p class="end-sub">🏆 SARI MENANG</p>
+    <div class="stat-card">
+      <div class="stat-row"><span>Reputasi tersisa</span><b id="win-life">14</b></div>
+      <div class="stat-row"><span>Putaran</span><b id="win-round">7</b></div>
+      <div class="stat-row"><span>Skor</span><b id="win-score">200</b></div>
+      <div class="stat-row"><span>Bintang</span><b id="win-stars">★★★</b></div>
+      <p id="win-sub" class="stat-note"></p>
+    </div>
+    <div class="end-buttons">
+      <button id="btn-again-win" class="btn btn-gold btn-big">MAIN LAGI (R)</button>
+      <button id="btn-menu-win" class="btn btn-white">MENU UTAMA</button>
+    </div>
+  </section>
+
+  <!-- Layar 4 — Kalah -->
+  <section id="screen-loss" class="screen hidden">
+    <div class="loss-sky"></div>
+    <div class="loss-lanterns" aria-hidden="true"><span>🏮</span><span>🏮</span><span>🏮</span></div>
+    <h1 class="end-title loss-title">LAPAKMU TUTUP…</h1>
+    <p class="end-sub">Juragan Bara menang — Reputasi lawan tersisa <b id="loss-life-inline">4</b></p>
+    <div class="stat-card">
+      <div class="stat-row"><span>Reputasi lawan tersisa</span><b id="loss-life">4</b></div>
+      <div class="stat-row"><span>Putaran</span><b id="loss-round">9</b></div>
+      <div class="stat-row"><span>Skor</span><b id="loss-score">40</b></div>
+      <div class="stat-row"><span>Bintang</span><b id="loss-stars">★☆☆</b></div>
+      <p id="loss-sub" class="stat-note"></p>
+    </div>
+    <div class="end-buttons">
+      <button id="btn-again-loss" class="btn btn-gold btn-big">COBA LAGI (R)</button>
+      <button id="btn-menu-loss" class="btn btn-white">MENU UTAMA</button>
+    </div>
+  </section>
+
+</div>
+<button id="mute-btn" class="mute-btn">🔊 Suara</button>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,378 @@
+/* style.css — Meja, kartu, HUD, banner, layar menang/kalah.
+   Palet senja CONCEPT.md §1. Resolusi staging 1280x800. Tanpa font/CDN eksternal. */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  background: #14091F;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: #FFF7E8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+#stage {
+  position: relative;
+  width: 1280px;
+  height: 800px;
+  max-width: 100vw;
+  max-height: 100vh;
+  overflow: hidden;
+  background: #2B1B4A;
+  box-shadow: 0 0 60px rgba(0,0,0,.6);
+}
+.screen { position: absolute; inset: 0; width: 1280px; height: 800px; }
+.hidden { display: none !important; }
+button { font-family: inherit; cursor: pointer; }
+button:disabled { opacity: .5; cursor: default; }
+
+.btn {
+  border: none;
+  border-radius: 12px;
+  font-weight: 800;
+  letter-spacing: .5px;
+  padding: 14px 26px;
+  font-size: 20px;
+  box-shadow: 0 4px 0 rgba(0,0,0,.35);
+}
+.btn:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,.35); }
+.btn-gold { background: #F2B705; color: #1A1210; }
+.btn-white { background: #FFF7E8; color: #1A1210; }
+.btn-big { font-size: 24px; padding: 18px 34px; }
+.mute-btn {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 50;
+  background: rgba(0,0,0,.55);
+  color: #FFF7E8;
+  border: 2px solid #F2B705;
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* ---------- Title screen ---------- */
+#screen-title { background: linear-gradient(180deg, #FF7A3D 0%, #C44A7A 45%, #2B1B4A 100%); text-align: center; }
+.title-sky { position: absolute; inset: 0; background: radial-gradient(circle at 50% 18%, rgba(255,240,180,.55), transparent 45%); }
+.title-lanterns { position: absolute; top: 18px; left: 0; right: 0; display: flex; justify-content: space-around; font-size: 44px; }
+.game-title {
+  position: relative;
+  margin-top: 150px;
+  font-size: 64px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: #fff;
+  text-shadow: 0 4px 0 #7A1E2E, 0 8px 24px rgba(0,0,0,.5);
+}
+.game-subtitle { position: relative; margin-top: 8px; font-size: 20px; font-weight: 700; color: #FFE9A8; }
+.game-tagline { position: relative; margin-top: 10px; font-size: 16px; font-style: italic; color: #FFF7E8; }
+#btn-start { position: relative; margin-top: 34px; }
+#btn-howto { position: relative; margin-top: 14px; display: block; margin-left: auto; margin-right: auto; font-size: 16px; padding: 10px 22px; }
+.howto {
+  position: relative;
+  width: 640px;
+  margin: 14px auto 0;
+  background: rgba(20,9,31,.85);
+  border: 2px solid #F2B705;
+  border-radius: 12px;
+  padding: 14px 18px;
+  text-align: left;
+  font-size: 14px;
+  line-height: 1.55;
+}
+.howto p { margin-bottom: 6px; }
+.title-cards {
+  position: absolute;
+  left: 50%;
+  bottom: 96px;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 18px;
+}
+.title-cards .card:nth-child(1) { transform: rotate(-6deg); }
+.title-cards .card:nth-child(3) { transform: rotate(6deg); }
+.title-wheel { position: absolute; right: 24px; bottom: 96px; }
+.title-footer { position: absolute; left: 0; right: 0; bottom: 18px; font-size: 14px; color: #E8D8F0; }
+
+/* ---------- Roda Senja mini ---------- */
+.wheel-mini {
+  background: rgba(20,9,31,.85);
+  border: 2px solid #7A4A21;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #FFF7E8;
+  text-align: left;
+  width: 220px;
+}
+.wheel-title { font-weight: 900; color: #F2B705; letter-spacing: 1px; margin-bottom: 2px; }
+
+/* ---------- Meja utama ---------- */
+#screen-table { background: #2B1B4A; }
+.table-sky {
+  position: absolute; top: 0; left: 0; right: 0; height: 150px;
+  background: linear-gradient(180deg, #FF7A3D 0%, #C44A7A 70%, rgba(196,74,122,0) 100%);
+  opacity: .9;
+}
+.side-info {
+  position: absolute;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: rgba(20,9,31,.72);
+  border: 2px solid #7A4A21;
+  border-radius: 14px;
+  padding: 10px 14px;
+}
+.enemy-info { left: 24px; top: 24px; width: 330px; }
+.player-info { left: 24px; top: 640px; width: 285px; }
+.avatar {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 34px; flex: none;
+}
+.avatar-enemy { background: #5A1410; border: 3px solid #E8442E; }
+.avatar-player { background: #0E3D24; border: 3px solid #3DDC84; }
+.side-name { font-size: 20px; font-weight: 900; color: #fff; }
+.side-stall { font-size: 13px; color: #D8C8E8; }
+.side-life-row { display: flex; gap: 14px; margin-top: 2px; align-items: baseline; }
+.side-life { font-size: 48px; font-weight: 900; line-height: 1; color: #fff; }
+.enemy-info .side-life { color: #FF4D4D; }
+.player-info .side-life { color: #3DDC84; }
+.side-shield { font-size: 22px; font-weight: 800; color: #7FB3FF; }
+.player-stars { font-size: 22px; color: #F2B705; letter-spacing: 2px; margin-top: 2px; }
+
+.enemy-hand {
+  position: absolute; left: 400px; top: 18px;
+  display: flex; gap: 8px;
+}
+.enemy-hand-count { position: absolute; left: 400px; top: 132px; font-size: 14px; color: #E8D8F0; }
+.round-label {
+  position: absolute; left: 540px; top: 132px; width: 200px;
+  text-align: center; font-size: 20px; font-weight: 900; color: #FFE9A8; letter-spacing: 1px;
+}
+.turn-label {
+  position: absolute; left: 380px; top: 236px; width: 520px;
+  text-align: center; font-size: 14px; font-weight: 700; color: #D8C8E8;
+}
+
+.intent-badge {
+  position: absolute; left: 510px; top: 158px;
+  width: 260px; height: 72px;
+  display: flex; align-items: center; gap: 10px;
+  border: 3px solid #E8442E;
+  border-radius: 12px;
+  padding: 6px 12px;
+  background: #5A1410;
+  animation: intentPulse 1.6s ease-in-out infinite;
+}
+@keyframes intentPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+.intent-icon { font-size: 36px; }
+.intent-body { display: flex; flex-direction: column; }
+.intent-text { font-size: 21px; font-weight: 900; color: #fff; line-height: 1.1; }
+.intent-sub { font-size: 11px; color: #F0D8D8; margin-top: 2px; }
+.table-wheel { position: absolute; left: 800px; top: 158px; width: 190px; }
+
+.center-area {
+  position: absolute; left: 380px; top: 250px;
+  width: 520px; height: 240px;
+  display: flex; justify-content: center; gap: 40px;
+}
+.center-slot { position: relative; width: 150px; height: 210px; }
+.center-label {
+  position: absolute; left: -20px; right: -20px; bottom: -24px;
+  text-align: center; font-size: 12px; color: #D8C8E8;
+}
+.combo-banner {
+  position: absolute; left: 340px; top: 488px; width: 600px;
+  text-align: center;
+  font-size: 26px; font-weight: 900; color: #1A1210;
+  background: #F2B705;
+  border: 3px solid #fff;
+  border-radius: 12px;
+  padding: 8px 12px;
+  box-shadow: 0 6px 24px rgba(242,183,5,.5);
+  animation: bannerPop .6s cubic-bezier(.2,1.6,.4,1);
+}
+@keyframes bannerPop { 0% { transform: scale(.8); opacity: 0; } 60% { transform: scale(1.08); opacity: 1; } 100% { transform: scale(1); } }
+.floating-damage {
+  position: absolute;
+  font-size: 44px; font-weight: 900; color: #FF4D4D;
+  text-shadow: 0 2px 0 #fff, 0 4px 12px rgba(0,0,0,.6);
+  animation: floatUp .9s ease-out forwards;
+  pointer-events: none;
+  z-index: 5;
+}
+@keyframes floatUp { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-46px); opacity: 0; } }
+/* Staging screenshot: angka damage di meja cover tetap terlihat. */
+body[data-shot="table"] .floating-damage { animation: none; opacity: 1; transform: translateY(-23px); }
+.log-line {
+  position: absolute; left: 340px; top: 548px; width: 600px;
+  text-align: center; font-size: 14px; color: #E8D8F0; font-style: italic;
+  text-shadow: 0 1px 4px rgba(0,0,0,.9);
+}
+
+.pile {
+  position: absolute;
+  width: 110px; height: 96px;
+  background: rgba(20,9,31,.72);
+  border: 2px solid #7A4A21;
+  border-radius: 12px;
+  text-align: center;
+  padding-top: 8px;
+}
+.deck-pile { left: 24px; top: 530px; }
+.discard-pile { left: 1146px; top: 530px; }
+.pile-cards { font-size: 30px; }
+.pile-label { font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #D8C8E8; }
+.pile-count { font-size: 26px; font-weight: 900; color: #fff; }
+
+.senja-badge {
+  position: absolute; left: 370px; top: 648px;
+  background: #F2B705; color: #1A1210;
+  font-size: 14px; font-weight: 900;
+  padding: 6px 12px; border-radius: 999px;
+}
+.coins-box {
+  position: absolute; left: 980px; top: 545px; width: 160px;
+  text-align: right;
+}
+.coins-value { font-size: 40px; font-weight: 900; color: #F2B705; line-height: 1; }
+.coins-label { font-size: 13px; color: #E8D8F0; margin-top: 2px; }
+.btn-end-turn { position: absolute; left: 1020px; top: 700px; width: 220px; height: 64px; font-size: 20px; }
+
+.player-hand {
+  position: absolute; left: 310px; top: 580px;
+  width: 680px; height: 210px;
+  display: flex; justify-content: center; gap: 6px;
+  align-items: flex-end;
+}
+/* Kipas: kartu sedikit menumpuk supaya 5 kartu muat di antara panel
+   pemain dan tombol, tanpa menutupi angka Reputasi / Koin. */
+.player-hand .card + .card { margin-left: -18px; }
+
+/* ---------- Kartu ---------- */
+.card {
+  position: relative;
+  width: 150px; height: 210px; flex: none;
+  background: #FFF7E8;
+  color: #1A1210;
+  border-radius: 12px;
+  border: 2px solid #7A4A21;
+  box-shadow: 0 6px 16px rgba(0,0,0,.45);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+}
+.card:hover { transform: translateY(-12px); }
+.card.selected {
+  transform: translateY(-12px);
+  outline: 4px solid #F2B705;
+  box-shadow: 0 0 0 4px #F2B705, 0 10px 24px rgba(0,0,0,.6);
+}
+.card.disabled { filter: brightness(.55); cursor: not-allowed; }
+.card.glow { box-shadow: 0 0 14px rgba(242,183,5,.55), 0 6px 16px rgba(0,0,0,.45); }
+.card-band { height: 10px; background: var(--suit, #E8442E); }
+.card-cost {
+  position: absolute; top: 16px; left: 10px;
+  width: 36px; height: 36px; border-radius: 50%;
+  background: #F2B705; color: #1A1210;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 900;
+  border: 2px solid #1A1210;
+}
+.card-icon { position: absolute; top: 14px; right: 10px; width: 34px; height: 34px; }
+.card-icon svg { width: 100%; height: 100%; }
+.card-name {
+  margin-top: 44px; padding: 0 8px;
+  font-size: 20px; font-weight: 900; line-height: 1.05; text-align: center;
+}
+.card-en { text-align: center; font-size: 11px; font-weight: 800; color: #7A4A21; letter-spacing: .5px; margin-top: 2px; }
+.card-watermark { position: absolute; left: 50%; top: 96px; transform: translateX(-50%); width: 84px; height: 84px; opacity: .15; }
+.card-watermark svg { width: 100%; height: 100%; }
+.card-big { position: absolute; left: 0; right: 0; bottom: 56px; text-align: center; font-size: 26px; font-weight: 900; }
+.card-text {
+  position: absolute; left: 0; right: 0; bottom: 22px;
+  text-align: center; font-size: 12px; font-weight: 600; padding: 0 6px;
+}
+.card-suit-name {
+  position: absolute; left: 0; right: 0; bottom: 4px;
+  text-align: center; font-size: 11px; font-weight: 800; color: var(--suit, #E8442E);
+}
+.chain-mark {
+  position: absolute; top: 14px; right: 52px;
+  font-size: 22px; font-weight: 900; color: #1E90D6;
+}
+.res-mark {
+  position: absolute; top: 18px; left: 52px;
+  background: var(--suit, #E8442E); color: #fff;
+  font-size: 12px; font-weight: 900; border-radius: 999px; padding: 2px 7px;
+}
+/* Kartu kecil di tengah meja */
+.center-slot .card { width: 150px; height: 210px; transform: scale(.94); }
+.center-slot .card:hover { transform: scale(.94); }
+/* Kartu contoh di title: sedikit lebih kecil */
+.title-cards .card { width: 132px; height: 186px; cursor: default; }
+.title-cards .card:hover { transform: none; }
+.title-cards .card:nth-child(1):hover { transform: rotate(-6deg); }
+.title-cards .card:nth-child(3):hover { transform: rotate(6deg); }
+.title-cards .card-name { font-size: 17px; margin-top: 38px; }
+.title-cards .card-big { font-size: 22px; bottom: 50px; }
+.title-cards .card-text { font-size: 11px; }
+
+/* Punggung kartu lawan */
+.card-back {
+  width: 84px; height: 110px; flex: none;
+  background: linear-gradient(160deg, #1E3A6E, #12294A);
+  border: 2px solid #F2B705;
+  border-radius: 8px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  color: #F2B705;
+  box-shadow: 0 4px 10px rgba(0,0,0,.4);
+}
+.back-moon { font-size: 30px; }
+.back-text { font-size: 10px; font-weight: 900; letter-spacing: 2px; margin-top: 2px; }
+
+/* Animasi deal: kartu masuk tangan (fill backwards supaya rotasi kipas
+   inline kembali berlaku setelah animasi selesai). */
+@keyframes dealIn { from { transform: translateY(-30px) rotate(-8deg); opacity: 0; } to { transform: translateY(0) rotate(0deg); opacity: 1; } }
+.player-hand .card { animation: dealIn .35s ease backwards; }
+.player-hand .card:nth-child(2) { animation-delay: .08s; }
+.player-hand .card:nth-child(3) { animation-delay: .16s; }
+.player-hand .card:nth-child(4) { animation-delay: .24s; }
+.player-hand .card:nth-child(5) { animation-delay: .32s; }
+
+/* ---------- Layar menang / kalah ---------- */
+#screen-win { background: linear-gradient(180deg, #FFB347 0%, #FF7A3D 40%, #2B1B4A 100%); text-align: center; }
+#screen-loss { background: linear-gradient(180deg, #3A2B4A 0%, #241631 55%, #12081C 100%); text-align: center; }
+.win-sky, .loss-sky { position: absolute; inset: 0; }
+.end-title { position: relative; margin-top: 110px; font-size: 56px; font-weight: 900; letter-spacing: 1px; text-shadow: 0 4px 0 rgba(0,0,0,.4); }
+.win-title { color: #F2B705; }
+.loss-title { color: #FFF7E8; }
+.end-sub { position: relative; margin-top: 10px; font-size: 22px; font-weight: 700; color: #FFF7E8; }
+.stat-card {
+  position: relative;
+  width: 480px; margin: 30px auto 0;
+  background: #FFF7E8; color: #1A1210;
+  border-radius: 16px; padding: 22px 28px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.5);
+  text-align: left;
+}
+.stat-row { display: flex; justify-content: space-between; font-size: 20px; padding: 8px 0; border-bottom: 1px solid #E8DCC8; }
+.stat-row:last-of-type { border-bottom: none; }
+.stat-row b { font-size: 24px; }
+.stat-note { margin-top: 12px; font-size: 13px; color: #7A4A21; }
+.end-buttons { position: relative; margin-top: 28px; display: flex; gap: 16px; justify-content: center; }
+.fireworks { position: absolute; inset: 0; pointer-events: none; }
+.fw { position: absolute; font-size: 40px; color: #F2B705; animation: burst 2.5s ease-out infinite; opacity: 0; }
+.fw.f1 { left: 20%; top: 18%; } .fw.f2 { left: 70%; top: 14%; animation-delay: .4s; }
+.fw.f3 { left: 45%; top: 8%; animation-delay: .8s; color: #FF7A3D; }
+.fw.f4 { left: 82%; top: 30%; animation-delay: 1.2s; } .fw.f5 { left: 12%; top: 34%; animation-delay: 1.6s; color: #fff; }
+.fw.f6 { left: 58%; top: 26%; animation-delay: 2s; }
+@keyframes burst { 0% { transform: scale(.4); opacity: 0; } 20% { opacity: 1; } 60% { transform: scale(1.4); opacity: .9; } 100% { transform: scale(1.8); opacity: 0; } }
+.loss-lanterns { position: absolute; top: 20px; left: 0; right: 0; display: flex; justify-content: space-around; font-size: 40px; opacity: .3; }
