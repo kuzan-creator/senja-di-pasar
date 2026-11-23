@@ -55,8 +55,10 @@ button:disabled { opacity: .5; cursor: default; }
 }
 
 /* ---------- Title screen ---------- */
-#screen-title { background: linear-gradient(180deg, #FF7A3D 0%, #C44A7A 45%, #2B1B4A 100%); text-align: center; }
-.title-sky { position: absolute; inset: 0; background: radial-gradient(circle at 50% 18%, rgba(255,240,180,.55), transparent 45%); }
+#screen-title { background: linear-gradient(180deg, #FF8A3D 0%, #E85A5A 28%, #A83A6E 55%, #3B1B55 78%, #1E1038 100%); text-align: center; }
+.title-sky { position: absolute; inset: 0; background:
+  radial-gradient(circle 34px at 32% 9%, rgba(255,236,170,.95), rgba(255,190,90,.6) 55%, rgba(255,190,90,0) 72%),
+  radial-gradient(circle at 50% 18%, rgba(255,240,180,.55), transparent 45%); }
 .title-lanterns { position: absolute; top: 18px; left: 0; right: 140px; display: flex; justify-content: space-around; font-size: 44px; }
 .game-title {
   position: relative;
@@ -166,7 +168,30 @@ button:disabled { opacity: .5; cursor: default; }
 .wheel-title { font-weight: 900; color: #F2B705; letter-spacing: 1px; margin-bottom: 2px; }
 
 /* ---------- Meja utama ---------- */
-#screen-table { background: #2B1B4A; }
+/* v3.3 — latar dramatis: cahaya senja di atas, vignette di tepi, bara halus.
+   Semua di BELAKANG konten (background + ::before); ukuran/posisi elemen tidak berubah. */
+#screen-table {
+  background:
+    radial-gradient(circle 2.5px at 10% 70%, rgba(255,196,100,.55), rgba(255,196,100,0) 70%),
+    radial-gradient(circle 2px at 22% 45%, rgba(255,170,80,.45), rgba(255,170,80,0) 70%),
+    radial-gradient(circle 3px at 38% 82%, rgba(255,150,60,.4), rgba(255,150,60,0) 70%),
+    radial-gradient(circle 2px at 55% 30%, rgba(255,190,110,.4), rgba(255,190,110,0) 70%),
+    radial-gradient(circle 2.5px at 71% 66%, rgba(255,170,80,.45), rgba(255,170,80,0) 70%),
+    radial-gradient(circle 2px at 86% 40%, rgba(255,196,100,.5), rgba(255,196,100,0) 70%),
+    radial-gradient(circle 3px at 93% 74%, rgba(255,150,60,.4), rgba(255,150,60,0) 70%),
+    radial-gradient(circle 2px at 47% 88%, rgba(255,180,90,.35), rgba(255,180,90,0) 70%),
+    radial-gradient(ellipse 90% 42% at 50% -6%, rgba(255,122,61,.34), rgba(255,122,61,0) 70%),
+    radial-gradient(ellipse 120% 90% at 50% 50%, rgba(0,0,0,0) 58%, rgba(9,3,17,.5) 100%),
+    linear-gradient(180deg, #3B2058 0%, #2B1B4A 34%, #1E1038 68%, #150A27 100%);
+}
+/* Siluet atap lapak di tepi bawah — ::before terlukis di bawah semua konten. */
+#screen-table::before {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 56px;
+  background: rgba(8,3,16,.5); pointer-events: none;
+  clip-path: polygon(0 100%, 0 62%, 70px 62%, 105px 28%, 150px 28%, 185px 58%, 280px 58%, 320px 22%, 375px 22%, 415px 52%, 540px 52%, 585px 26%, 640px 26%, 685px 56%, 800px 56%, 845px 30%, 900px 30%, 940px 60%, 1050px 60%, 1095px 20%, 1150px 20%, 1190px 54%, 1280px 54%, 1280px 100%);
+  animation: stall-breathe 7s ease-in-out infinite alternate;
+}
+@keyframes stall-breathe { from { opacity: .55; } to { opacity: .8; } }
 .table-sky {
   position: absolute; top: 0; left: 0; right: 0; height: 150px;
   background: linear-gradient(180deg, #FF7A3D 0%, #C44A7A 70%, rgba(196,74,122,0) 100%);
@@ -443,8 +468,12 @@ body[data-shot="table"] .floating-damage { animation: none; opacity: 1; transfor
 .player-hand .card:nth-child(5) { animation-delay: .32s; }
 
 /* ---------- Layar menang / kalah ---------- */
-#screen-win { background: linear-gradient(180deg, #FFB347 0%, #FF7A3D 40%, #2B1B4A 100%); text-align: center; }
-#screen-loss { background: linear-gradient(180deg, #3A2B4A 0%, #241631 55%, #12081C 100%); text-align: center; }
+#screen-win { background:
+  radial-gradient(ellipse 70% 30% at 50% 0%, rgba(255,240,180,.5), rgba(255,240,180,0) 70%),
+  linear-gradient(180deg, #FFC46B 0%, #FF7A3D 32%, #C44A5E 68%, #2B1B4A 100%); text-align: center; }
+#screen-loss { background:
+  radial-gradient(circle 40px at 68% 10%, rgba(220,225,255,.28), rgba(220,225,255,0) 70%),
+  linear-gradient(180deg, #33244A 0%, #1D1229 55%, #0C0516 100%); text-align: center; }
 .win-sky, .loss-sky { position: absolute; inset: 0; }
 .end-title { position: relative; margin-top: 110px; font-size: 56px; font-weight: 900; letter-spacing: 1px; text-shadow: 0 4px 0 rgba(0,0,0,.4); }
 .win-title { color: #F2B705; }
