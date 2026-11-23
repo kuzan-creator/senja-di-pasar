@@ -4,6 +4,7 @@
 import { CARDS, cardById } from './cards.js';
 
 const DUPLICATES = ['obor', 'sate', 'ikan', 'timbangan'];
+export { DUPLICATES };
 
 export function shuffle(arr) {
   const a = arr.slice();

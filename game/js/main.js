@@ -6,8 +6,8 @@ import { startTurn, endTurnCleanup, playCard, checkWinner } from './hand.js';
 import { planTurn } from './ai.js';
 import { makeIntent } from './intent.js';
 import { render, cardElement } from './render.js';
-import { cardById } from './cards.js';
-import { makeInstance } from './deck.js';
+import { CARDS, cardById, suitById } from './cards.js';
+import { makeInstance, DUPLICATES } from './deck.js';
 import { stageShot } from './shots.js';
 import { sfx } from './audio.js';
 
@@ -62,7 +62,7 @@ function startPlayerTurn() {
   state.intent = makeIntent(plan);
   state.aiPlan = plan.cards.map((c) => c.uid);
   state.selectedIndex = -1;
-  if (maybeEnd()) return;
+  if (maybeEnd()) return; // Pedagang bisa menutup game di awal giliran (v3)
   show();
 }
 
@@ -84,6 +84,7 @@ function playSelected() {
   const res = playCard(state, 'player', card.uid);
   if (!res.ok) {
     if (res.reason === 'no-coins') addLog(state, 'Koin tidak cukup untuk ' + card.name);
+    else if (res.reason === 'board-full') addLog(state, 'Meja penuh — maksimal 3 Pedagang');
     show();
     return;
   }
@@ -116,6 +117,7 @@ function endTurn() {
 function runEnemyTurn() {
   const msgs = startTurn(state, 'enemy');
   for (const m of msgs) addLog(state, m);
+  if (maybeEnd()) return; // Pedagang AI bisa menutup game di awal gilirannya (v3)
   // Pakai rencana yang sudah ditampilkan sebagai intent bila masih valid.
   let plan = null;
   if (state.aiPlan) {
@@ -176,6 +178,113 @@ function backToTitle() {
 
 // ---------- Title screen: 3 kartu contoh ----------
 
+// ---------- Menu title (ala Hearthstone: Koleksi / Cara Main / Pengaturan) ----------
+
+const OVERLAY_IDS = ['howto-panel', 'collection-panel', 'settings-panel'];
+let colFilter = 'all';
+let colBuilt = false;
+
+function hideOverlays() {
+  for (const id of OVERLAY_IDS) { const n = el(id); if (n) n.classList.add('hidden'); }
+}
+function showOverlay(id) {
+  hideOverlays();
+  const n = el(id);
+  if (n) n.classList.remove('hidden');
+}
+function toggleOverlay(id) {
+  const n = el(id);
+  if (n && !n.classList.contains('hidden')) hideOverlays();
+  else showOverlay(id);
+}
+function syncMuteLabels() {
+  const m = sfx.isMuted();
+  const b1 = el('mute-btn');
+  if (b1) b1.textContent = m ? '🔇 Bisu' : '🔊 Suara';
+  const b2 = el('btn-mute-setting');
+  if (b2) b2.textContent = m ? '🔇 SUARA: BISU' : '🔊 SUARA: NYALA';
+}
+
+// Koleksi: 28 kartu unik (4 di antaranya ×2 di deck 36 kartu). Grid kecil +
+// detail kartu penuh saat diklik; filter per suit.
+function fillCollection() {
+  const grid = el('col-grid');
+  const filters = el('col-filters');
+  if (!grid || !filters || colBuilt) return;
+  colBuilt = true;
+  const counts = {};
+  for (const id of DUPLICATES) counts[id] = 2;
+  const suits = [
+    { id: 'all', name: 'Semua', emoji: '🃏' },
+    { id: 'lampion', name: 'Lampion', emoji: '🔥' },
+    { id: 'ombak', name: 'Ombak', emoji: '🌊' },
+    { id: 'daun', name: 'Daun', emoji: '🌿' },
+    { id: 'bulan', name: 'Bulan', emoji: '🌙' },
+  ];
+  for (const s of suits) {
+    const chip = document.createElement('button');
+    chip.className = 'col-chip' + (s.id === 'all' ? ' active' : '');
+    chip.textContent = s.emoji + ' ' + s.name;
+    chip.addEventListener('click', () => {
+      colFilter = s.id;
+      filters.querySelectorAll('.col-chip').forEach((c) => c.classList.remove('active'));
+      chip.classList.add('active');
+      renderCollectionTiles(counts);
+      sfx.click();
+    });
+    filters.appendChild(chip);
+  }
+  renderCollectionTiles(counts);
+  // Detail awal: kartu pertama.
+  const first = CARDS[0];
+  if (first) showCollectionDetail(first, counts);
+}
+
+function renderCollectionTiles(counts) {
+  const grid = el('col-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  for (const def of CARDS) {
+    if (colFilter !== 'all' && def.suit !== colFilter) continue;
+    const suit = suitById(def.suit);
+    const tile = document.createElement('button');
+    tile.className = 'col-tile';
+    tile.style.setProperty('--suit', suit.color);
+    tile.innerHTML =
+      '<span class="col-tile-cost">' + def.cost + '</span>' +
+      '<span><span class="col-tile-name">' + def.name + '</span><br>' +
+      '<span class="col-tile-sub">' + suit.emoji + ' ' + suit.name + '</span></span>' +
+      (counts[def.id] ? '<span class="col-tile-count">×2</span>' : '') +
+      '<span class="col-tile-big">' + def.big + '</span>';
+    tile.addEventListener('click', () => {
+      grid.querySelectorAll('.col-tile').forEach((t) => t.classList.remove('selected'));
+      tile.classList.add('selected');
+      showCollectionDetail(def, counts);
+      sfx.click();
+    });
+    grid.appendChild(tile);
+  }
+}
+
+function showCollectionDetail(def, counts) {
+  const detail = el('col-detail');
+  if (!detail) return;
+  detail.innerHTML = '';
+  detail.appendChild(cardElement(makeInstance(def), {}));
+  const suit = suitById(def.suit);
+  const info = document.createElement('div');
+  info.className = 'col-detail-text';
+  let html = '<b>' + def.name + '</b> — ' + suit.emoji + ' ' + suit.name +
+    '<br>Biaya: <b>' + def.cost + ' Koin</b> • Di deck: <b>×' + (counts[def.id] || 1) + '</b>';
+  if (def.merchant) {
+    html += '<br>Pedagang Tetap: Serang <b>' + def.merchant.atk + '</b>, Darah <b>' + def.merchant.hp + '</b>. Menetap di meja, menyerang tiap giliran.';
+  } else {
+    html += '<br>' + def.text;
+  }
+  info.innerHTML = html;
+  detail.appendChild(info);
+}
+
 function fillTitleCards() {
   const box = el('title-cards');
   if (!box || box.hasChildNodes()) return;
@@ -190,10 +299,10 @@ function fillTitleCards() {
 function onKey(e) {
   if (staged) return;
   const k = e.key.toLowerCase();
+  if (k === 'escape') { hideOverlays(); return; }
   if (k === 'm') {
     const m = sfx.toggleMute();
-    const btn = el('mute-btn');
-    if (btn) btn.textContent = m ? '🔇 Bisu' : '🔊 Suara';
+    syncMuteLabels();
     return;
   }
   if (state.phase === 'player') {
@@ -224,22 +333,25 @@ function init() {
     document.body.dataset.shot = shot;
   }
   fillTitleCards();
+  fillCollection();
+  syncMuteLabels();
   const bind = (id, fn) => { const n = el(id); if (n) n.addEventListener('click', fn); };
   bind('btn-start', () => { sfx.click(); startGame(); });
-  bind('btn-howto', () => {
-    const p = el('howto-panel');
-    if (p) p.classList.toggle('hidden');
-    sfx.click();
-  });
+  bind('btn-howto', () => { toggleOverlay('howto-panel'); sfx.click(); });
+  bind('btn-collection', () => { toggleOverlay('collection-panel'); sfx.click(); });
+  bind('btn-settings', () => { syncMuteLabels(); toggleOverlay('settings-panel'); sfx.click(); });
+  bind('btn-close-howto', () => { hideOverlays(); sfx.click(); });
+  bind('btn-close-collection', () => { hideOverlays(); sfx.click(); });
+  bind('btn-close-settings', () => { hideOverlays(); sfx.click(); });
+  bind('btn-mute-setting', () => { sfx.toggleMute(); syncMuteLabels(); sfx.click(); });
   bind('btn-end-turn', () => { sfx.click(); endTurn(); });
   bind('btn-again-win', () => { sfx.click(); startGame(); });
   bind('btn-menu-win', () => { sfx.click(); backToTitle(); });
   bind('btn-again-loss', () => { sfx.click(); startGame(); });
   bind('btn-menu-loss', () => { sfx.click(); backToTitle(); });
   bind('mute-btn', () => {
-    const m = sfx.toggleMute();
-    const btn = el('mute-btn');
-    if (btn) btn.textContent = m ? '🔇 Bisu' : '🔊 Suara';
+    sfx.toggleMute();
+    syncMuteLabels();
   });
   bind('center-area', () => { if (state.selectedIndex >= 0) playSelected(); });
   document.addEventListener('keydown', onKey);

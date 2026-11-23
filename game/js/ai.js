@@ -3,6 +3,7 @@
 // dengan pemain; tidak melihat tangan pemain; tidak mendapat koin lebih.
 
 import { isPureHeal, isAttack } from './cards.js';
+import { projectMerchantDamage, MAX_MERCHANTS } from './merchants.js';
 
 export function determineMood(ai, player) {
   if (ai.life < 10) return 'bertahan';
@@ -26,6 +27,19 @@ export function moodLabel(mood) {
 // tidak menutup game, sehingga damage AI cuma ~5/giliran.
 function cardScore(card, mood, round, foeLife) {
   let s = 0;
+  // Pedagang Tetap (v3): damage yang berulang tiap giliran — dinilai dari
+  // Serang (bernilai tiap giliran ia hidup) + Darah (berapa lama ia hidup).
+  // Bobot sengaja TINGGI (atk 3,5x): sim menunjukkan AI memanggil Pedagang
+  // jauh lebih jarang dari pemain (1,50 vs 2,60/game) karena kartu serang
+  // langsung selalu menang skor — tanpa bobot ini Pedagang jadi milik
+  // pemain saja dan game condong ke pemain.
+  if (card.merchant) {
+    const m = card.merchant;
+    s += m.atk * 3.5 + m.hp * 1.0;
+    if (mood === 'bertahan') s += m.hp * 0.8; // tembok saat sekarat
+    if (round <= 2 && card.cost >= 5) s -= 100;
+    return s - card.cost * 0.4;
+  }
   const dmg = card.dmg || 0;
   const shield = card.shield || 0;
   const heal = card.heal || 0;
@@ -60,10 +74,13 @@ export function chooseCards(ai, player, round) {
   let coins = ai.coins;
   const chosen = [];
   const maxCards = round === 1 ? 2 : 6;
+  // Simulasi papan Pedagang: yang sudah dipilih ikut mengisi meja (max 3).
+  let boardCount = ai.merchants.length;
   const blocked = (card) => {
     if (card.cost > coins) return true;
     if (isPureHeal(card) && mood !== 'bertahan') return true;
     if (card.id === 'panen-raya' && ai.panenUsed) return true;
+    if (card.merchant && boardCount >= MAX_MERCHANTS) return true;
     if (round <= 2 && card.cost >= 5) return true;
     return false;
   };
@@ -93,6 +110,7 @@ export function chooseCards(ai, player, round) {
     chosen.push(pick);
     coins -= pick.cost;
     coins += pick.coins || 0;
+    if (pick.merchant) boardCount += 1;
     for (let k = 0; k < (pick.draw || 0); k++) {
       if (deck.length > 0) hand.push(deck.pop());
     }
@@ -115,6 +133,15 @@ export function planTurn(ai, player, round) {
     heal += c.heal || 0;
     draw += c.draw || 0;
   }
+  // Pedagang Tetap (v3): semua Pedagang AI yang ada di meja akan menyerang
+  // di awal giliran AI (yang baru dipanggil pun jadi siap saat itu) — damage
+  // mereka ikut dihitung ke intent, diproyeksikan melawan Pedagang pemain
+  // yang ada sekarang (perkiraan, seperti angka intent lainnya).
+  const merchDmg = projectMerchantDamage(
+    ai.merchants.map((m) => ({ ...m, ready: true })),
+    player.merchants,
+  );
+  dmg += merchDmg;
   let kind = 'draw';
   let value = draw;
   if (dmg > 0 && dmg >= shield && dmg >= heal) { kind = 'attack'; value = dmg; }

@@ -46,26 +46,27 @@ export function suitById(id) {
 
 // Efek: dmg, shield, heal, draw, coins (giliran ini), coinsNext (giliran depan),
 // burn (damage di putaran berikut), discardEnemy, breakShield, pierce,
-// discardSelf, special ('lelang' | 'juragan').
+// discardSelf, special ('juragan'), merchant {atk, hp} (Pedagang Tetap v3:
+// menetap di meja, menyerang otomatis tiap giliran, max 3 per pihak).
 export const CARDS = [
   { id: 'obor', name: 'Obor Keliling', en: '3 DMG', suit: 'lampion', cost: 1, dmg: 3, text: 'Serang 3. Pembuka paling murah.', big: '⚔ 3' },
   { id: 'arang', name: 'Arang Panas', en: '2 DMG + BURN 2', suit: 'lampion', cost: 1, dmg: 2, burn: 2, text: 'Bara yang terus menyala.', big: '⚔ 2' },
   { id: 'sate', name: 'Sate Membara', en: '5 DMG', suit: 'lampion', cost: 2, dmg: 5, text: 'Serang 5.', big: '⚔ 5' },
   { id: 'cabai', name: 'Cabai Rawit', en: '4 DMG PIERCE', suit: 'lampion', cost: 2, dmg: 4, pierce: true, text: 'Pedasnya menembus terpal.', big: '⚔ 4' },
   { id: 'mercon', name: 'Mercon Senja', en: '6 DMG', suit: 'lampion', cost: 3, dmg: 6, text: 'Serang 6.', big: '⚔ 6' },
-  { id: 'lampion-raksasa', name: 'Lampion Raksasa', en: '7 DMG', suit: 'lampion', cost: 4, dmg: 7, text: 'Serang 7.', big: '⚔ 7' },
+  { id: 'lampion-raksasa', name: 'Penjaga Lampion', en: 'PEDAGANG 3/6', suit: 'lampion', cost: 4, merchant: { atk: 3, hp: 6 }, text: 'Pedagang Tetap: Serang 3, Darah 6. Menyerang tiap giliran.', big: '⚔3 ♥6' },
   { id: 'kembang-api', name: 'Kembang Api', en: '9 DMG', suit: 'lampion', cost: 5, dmg: 9, discardSelf: 1, text: 'Serang 9. Buang 1 kartu.', big: '⚔ 9' },
   { id: 'es-batu', name: 'Es Batu', en: 'SHIELD 3 + DRAW 1', suit: 'ombak', cost: 1, shield: 3, draw: 1, text: 'Perisai 3. Ambil 1 kartu.', big: '🛡 3' },
   { id: 'ikan', name: 'Ikan Segar', en: '2 DMG + DRAW 1', suit: 'ombak', cost: 1, dmg: 2, draw: 1, text: 'Serang 2. Ambil 1 kartu.', big: '⚔ 2' },
   { id: 'jala', name: 'Jala Nelayan', en: '3 DMG + DISCARD', suit: 'ombak', cost: 2, dmg: 3, discardEnemy: 1, text: 'Serang 3. Lawan buang 1 kartu.', big: '⚔ 3' },
   { id: 'ombak-pasar', name: 'Ombak Pasar', en: '4 DMG + BREAK 3', suit: 'ombak', cost: 2, dmg: 4, breakShield: 3, text: 'Serang 4. Hancurkan 3 perisai.', big: '⚔ 4' },
   { id: 'hujan', name: 'Hujan Gerimis', en: 'HEAL 5 + 2 DMG', suit: 'ombak', cost: 3, heal: 5, dmg: 2, text: 'Pulih 5. Serang 2.', big: '✚ 5' },
-  { id: 'perahu', name: 'Perahu Layar', en: '5 DMG + DRAW 1', suit: 'ombak', cost: 3, dmg: 5, draw: 1, text: 'Serang 5. Ambil 1 kartu.', big: '⚔ 5' },
+  { id: 'perahu', name: 'Nakhoda Perahu', en: 'PEDAGANG 2/4', suit: 'ombak', cost: 3, merchant: { atk: 2, hp: 4 }, text: 'Pedagang Tetap: Serang 2, Darah 4. Menyerang tiap giliran.', big: '⚔2 ♥4' },
   { id: 'badai', name: 'Badai Pesisir', en: '6 DMG + DISCARD 2', suit: 'ombak', cost: 5, dmg: 6, discardEnemy: 2, text: 'Serang 6. Lawan buang 2 kartu.', big: '⚔ 6' },
   { id: 'daun-pisang', name: 'Daun Pisang', en: 'SHIELD 4', suit: 'daun', cost: 1, shield: 4, text: 'Perisai 4.', big: '🛡 4' },
   { id: 'rempah', name: 'Rempah Wangi', en: '+1 COIN NEXT', suit: 'daun', cost: 1, coinsNext: 1, text: 'Koin +1 giliran depan.', big: '🪙 1' },
   { id: 'jamu', name: 'Jamu Kunyit', en: 'HEAL 5', suit: 'daun', cost: 2, heal: 5, text: 'Pulih 5.', big: '✚ 5' },
-  { id: 'sayur', name: 'Sayur Segar', en: 'SHIELD 5 + DRAW 1', suit: 'daun', cost: 2, shield: 5, draw: 1, text: 'Perisai 5. Ambil 1 kartu.', big: '🛡 5' },
+  { id: 'sayur', name: 'Tukang Sayur', en: 'PEDAGANG 1/5', suit: 'daun', cost: 2, merchant: { atk: 1, hp: 5 }, text: 'Pedagang Tetap: Serang 1, Darah 5. Menyerang tiap giliran.', big: '⚔1 ♥5' },
   { id: 'pohon-mangga', name: 'Pohon Mangga', en: 'HEAL 7 + SHIELD 2', suit: 'daun', cost: 3, heal: 7, shield: 2, text: 'Pulih 7. Perisai 2.', big: '✚ 7' },
   { id: 'kebun', name: 'Kebun Tetangga', en: 'HEAL 4 + DRAW 2', suit: 'daun', cost: 3, heal: 4, draw: 2, text: 'Pulih 4. Ambil 2 kartu.', big: '✚ 4' },
   { id: 'panen-raya', name: 'Panen Raya', en: 'HEAL 8 + SHIELD 4', suit: 'daun', cost: 5, heal: 8, shield: 4, text: 'Pulih 8. Perisai 4.', big: '✚ 8' },
@@ -73,7 +74,7 @@ export const CARDS = [
   { id: 'dompet', name: 'Dompet Kulit', en: 'DRAW 1', suit: 'bulan', cost: 1, draw: 1, text: 'Ambil 1 kartu.', big: '▤ 1' },
   { id: 'tabungan', name: 'Tabungan Senja', en: 'SHIELD 4 + COIN 1', suit: 'bulan', cost: 2, shield: 4, coins: 1, text: 'Perisai 4. Koin +1.', big: '🛡 4' },
   { id: 'timbangan', name: 'Timbangan Adil', en: '3 DMG + COIN 1', suit: 'bulan', cost: 2, dmg: 3, coins: 1, text: 'Serang 3. Koin +1.', big: '⚔ 3' },
-  { id: 'lelang', name: 'Lelang Kilat', en: '5 DMG', suit: 'bulan', cost: 3, dmg: 5, special: 'lelang', text: 'Serang 5. Lawan sekarat: +2 koin.', big: '⚔ 5' },
+  { id: 'lelang', name: 'Juru Lelang', en: 'PEDAGANG 2/3', suit: 'bulan', cost: 3, merchant: { atk: 2, hp: 3 }, text: 'Pedagang Tetap: Serang 2, Darah 3. Menyerang tiap giliran.', big: '⚔2 ♥3' },
   { id: 'juragan-datang', name: 'Juragan Datang', en: '7 DMG', suit: 'bulan', cost: 4, dmg: 7, special: 'juragan', text: 'Serang 7. Hancurkan terpal: +2 koin.', big: '⚔ 7' },
   { id: 'bulan-purnama', name: 'Bulan Purnama', en: '8 DMG + HEAL 5', suit: 'bulan', cost: 5, dmg: 8, heal: 5, text: 'Serang 8. Pulih 5.', big: '⚔ 8' },
 ];
@@ -88,5 +89,5 @@ export function isPureHeal(card) {
 }
 
 export function isAttack(card) {
-  return (card.dmg || 0) > 0;
+  return (card.dmg || 0) > 0 || !!card.merchant;
 }

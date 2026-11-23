@@ -70,11 +70,23 @@ button:disabled { opacity: .5; cursor: default; }
 .game-subtitle { position: relative; margin-top: 8px; font-size: 20px; font-weight: 700; color: #FFE9A8; }
 .game-tagline { position: relative; margin-top: 10px; font-size: 16px; font-style: italic; color: #FFF7E8; }
 #btn-start { position: relative; margin-top: 34px; }
-#btn-howto { position: relative; margin-top: 14px; display: block; margin-left: auto; margin-right: auto; font-size: 16px; padding: 10px 22px; }
-.howto {
-  position: relative;
-  width: 640px;
-  margin: 14px auto 0;
+.title-menu { position: relative; margin-top: 14px; display: flex; justify-content: center; gap: 12px; }
+.title-menu .btn { font-size: 16px; padding: 10px 22px; }
+/* Panel menu title (Cara Main / Koleksi / Pengaturan) — overlay di atas
+   layar title, bukan in-flow: tidak menutupi kartu contoh dan tombol. */
+.title-overlay {
+  position: absolute; inset: 0; z-index: 30;
+  background: rgba(20,9,31,.94);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 16px 40px;
+}
+.title-overlay.hidden { display: none; }
+.overlay-box { width: 680px; max-width: 92%; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.overlay-box.overlay-wide { width: 1120px; }
+.overlay-title { font-size: 32px; font-weight: 900; color: #fff; letter-spacing: 1px; text-shadow: 0 3px 0 #7A1E2E; }
+.overlay-sub { font-size: 14px; color: #E8D8F0; }
+.howto-text {
+  width: 640px; max-width: 100%;
   background: rgba(20,9,31,.85);
   border: 2px solid #F2B705;
   border-radius: 12px;
@@ -83,7 +95,49 @@ button:disabled { opacity: .5; cursor: default; }
   font-size: 14px;
   line-height: 1.55;
 }
-.howto p { margin-bottom: 6px; }
+.howto-text p { margin-bottom: 6px; }
+/* Koleksi: filter suit + grid kartu + detail. */
+.col-filters { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.col-chip {
+  font-size: 14px; font-weight: 800; padding: 7px 14px; border-radius: 999px;
+  border: 2px solid #7A4A21; background: #FFF7E8; color: #1A1210; cursor: pointer;
+}
+.col-chip.active { background: #F2B705; border-color: #1A1210; }
+.col-body { display: flex; gap: 18px; width: 100%; align-items: stretch; }
+.col-grid {
+  flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+  max-height: 540px; overflow-y: auto; padding-right: 4px; align-content: start;
+}
+.col-tile {
+  display: flex; align-items: center; gap: 7px; text-align: left;
+  background: #FFF7E8; color: #1A1210; border: 2px solid var(--suit, #E8442E);
+  border-left-width: 8px; border-radius: 10px; padding: 4px 10px; cursor: pointer;
+  font-family: inherit;
+}
+.col-tile:hover { outline: 3px solid #F2B705; }
+.col-tile.selected { outline: 3px solid #F2B705; background: #FFE9A8; }
+.col-tile-cost {
+  width: 26px; height: 26px; flex: none; border-radius: 50%;
+  background: #F2B705; border: 2px solid #1A1210;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px; font-weight: 900;
+}
+.col-tile-name { font-size: 12px; font-weight: 900; line-height: 1.1; }
+.col-tile-sub { font-size: 10px; font-weight: 700; color: #7A4A21; }
+.col-tile-big { margin-left: auto; font-size: 16px; font-weight: 900; white-space: nowrap; }
+.col-tile-count { font-size: 11px; font-weight: 900; color: #fff; background: #E8442E; border-radius: 999px; padding: 2px 6px; }
+.col-detail {
+  width: 300px; flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+  background: rgba(255,247,232,.08); border: 2px solid #7A4A21; border-radius: 12px; padding: 14px;
+}
+.col-detail .card { transform: scale(.82); margin: -14px 0; cursor: default; }
+.col-detail .card:hover { transform: scale(.82); }
+.col-detail-empty { color: #E8D8F0; font-size: 14px; text-align: center; margin: auto 0; }
+.col-detail-text { font-size: 13px; line-height: 1.5; color: #FFF7E8; text-align: left; }
+.col-detail-text b { color: #F2B705; }
+/* Pengaturan. */
+.set-row { display: flex; align-items: center; gap: 16px; font-size: 16px; font-weight: 700; }
+.set-row .btn { font-size: 16px; padding: 10px 22px; }
 .title-cards {
   position: absolute;
   left: 50%;
@@ -157,7 +211,7 @@ button:disabled { opacity: .5; cursor: default; }
   text-align: center; font-size: 20px; font-weight: 900; color: #FFE9A8; letter-spacing: 1px;
 }
 .turn-label {
-  position: absolute; left: 380px; top: 236px; width: 520px;
+  position: absolute; left: 380px; top: 228px; width: 520px;
   text-align: center; font-size: 14px; font-weight: 700; color: #D8C8E8;
 }
 
@@ -179,19 +233,19 @@ button:disabled { opacity: .5; cursor: default; }
 .table-wheel { position: absolute; left: 800px; top: 158px; width: 190px; }
 
 .center-area {
-  position: absolute; left: 380px; top: 250px;
-  width: 520px; height: 240px;
+  position: absolute; left: 380px; top: 232px;
+  width: 520px; height: 200px;
   display: flex; justify-content: center; gap: 40px;
 }
-.center-slot { position: relative; width: 150px; height: 210px; }
+.center-slot { position: relative; width: 150px; height: 180px; }
 .center-label {
   position: absolute; left: -20px; right: -20px; bottom: -24px;
   text-align: center; font-size: 12px; color: #D8C8E8;
 }
 .combo-banner {
-  position: absolute; left: 340px; top: 488px; width: 600px;
+  position: absolute; left: 340px; top: 446px; width: 600px;
   text-align: center;
-  font-size: 26px; font-weight: 900; color: #1A1210;
+  font-size: 24px; font-weight: 900; color: #1A1210;
   background: #F2B705;
   border: 3px solid #fff;
   border-radius: 12px;
@@ -211,11 +265,38 @@ button:disabled { opacity: .5; cursor: default; }
 @keyframes floatUp { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-46px); opacity: 0; } }
 /* Staging screenshot: angka damage di meja cover tetap terlihat. */
 body[data-shot="table"] .floating-damage { animation: none; opacity: 1; transform: translateY(-23px); }
+/* Log permainan — 3 baris terakhir, terbaru paling bawah dan paling terang. */
 .log-line {
-  position: absolute; left: 340px; top: 548px; width: 600px;
-  text-align: center; font-size: 14px; color: #E8D8F0; font-style: italic;
+  position: absolute; left: 340px; top: 528px; width: 600px;
+  text-align: center; font-size: 13px; color: #E8D8F0;
   text-shadow: 0 1px 4px rgba(0,0,0,.9);
+  line-height: 1.35;
 }
+.log-row { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.log-old { opacity: .6; }
+
+/* ---------- Pedagang Tetap (v3) ---------- */
+.merchant-row { position: absolute; display: flex; flex-direction: column; gap: 2px; }
+.enemy-merchants { left: 24px; top: 146px; width: 466px; }
+.player-merchants { left: 407px; top: 490px; width: 466px; }
+.merchant-label { font-size: 11px; font-weight: 900; letter-spacing: 1px; color: #F2B705; }
+.merchant-tiles { display: flex; gap: 8px; }
+.merchant-tile {
+  width: 150px; height: 36px; flex: none;
+  background: linear-gradient(180deg, #3A2415, #241631);
+  border: 2px solid var(--suit, #E8442E);
+  border-radius: 9px;
+  display: flex; align-items: center; gap: 6px;
+  padding: 0 8px;
+  font-size: 13px; font-weight: 800; color: #FFF7E8;
+  box-shadow: 0 3px 8px rgba(0,0,0,.4);
+}
+.merchant-sleeping { opacity: .75; border-style: dashed; }
+.mt-emoji { font-size: 17px; }
+.mt-name { white-space: nowrap; }
+.mt-stats { margin-left: auto; display: flex; gap: 5px; font-size: 13px; white-space: nowrap; }
+.mt-atk { color: #FFD34D; white-space: nowrap; }
+.mt-hp { color: #3DDC84; white-space: nowrap; }
 
 .pile {
   position: absolute;
@@ -247,11 +328,16 @@ body[data-shot="table"] .floating-damage { animation: none; opacity: 1; transfor
 .btn-end-turn { position: absolute; left: 1020px; top: 700px; width: 220px; height: 64px; font-size: 20px; }
 
 .player-hand {
-  position: absolute; left: 310px; top: 580px;
-  width: 680px; height: 210px;
+  position: absolute; left: 310px; top: 588px;
+  width: 680px; height: 202px;
   display: flex; justify-content: center; gap: 6px;
   align-items: flex-end;
 }
+/* Kartu tangan sedikit lebih pendek (190 vs 210) supaya kipas + kartu
+   yang dipilih tidak menutupi baris terakhir log di atasnya. Isi kartu
+   menempel ke atas (nama) dan bawah (angka besar/teks), jadi ruang
+   tengah yang menyusut saja — kartu contoh title 186px membuktikannya. */
+.player-hand .card { height: 190px; }
 /* Kipas: kartu sedikit menumpuk supaya 5 kartu muat di antara panel
    pemain dan tombol, tanpa menutupi angka Reputasi / Koin. */
 .player-hand .card + .card { margin-left: -18px; }
@@ -269,9 +355,9 @@ body[data-shot="table"] .floating-damage { animation: none; opacity: 1; transfor
   cursor: pointer;
   transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
 }
-.card:hover { transform: translateY(-12px); }
+.card:hover { transform: translateY(-8px); }
 .card.selected {
-  transform: translateY(-12px);
+  transform: translateY(-8px);
   outline: 4px solid #F2B705;
   box-shadow: 0 0 0 4px #F2B705, 0 10px 24px rgba(0,0,0,.6);
 }
@@ -314,8 +400,8 @@ body[data-shot="table"] .floating-damage { animation: none; opacity: 1; transfor
   font-size: 12px; font-weight: 900; border-radius: 999px; padding: 2px 7px;
 }
 /* Kartu kecil di tengah meja */
-.center-slot .card { width: 150px; height: 210px; transform: scale(.94); }
-.center-slot .card:hover { transform: scale(.94); }
+.center-slot .card { width: 150px; height: 210px; transform: scale(.8); }
+.center-slot .card:hover { transform: scale(.8); }
 /* Kartu contoh di title: sedikit lebih kecil */
 .title-cards .card { width: 132px; height: 186px; cursor: default; }
 .title-cards .card:hover { transform: none; }
@@ -375,4 +461,20 @@ body[data-shot="table"] .floating-damage { animation: none; opacity: 1; transfor
 .fw.f4 { left: 82%; top: 30%; animation-delay: 1.2s; } .fw.f5 { left: 12%; top: 34%; animation-delay: 1.6s; color: #fff; }
 .fw.f6 { left: 58%; top: 26%; animation-delay: 2s; }
 @keyframes burst { 0% { transform: scale(.4); opacity: 0; } 20% { opacity: 1; } 60% { transform: scale(1.4); opacity: .9; } 100% { transform: scale(1.8); opacity: 0; } }
+/* Hujan lampion + koin di layar menang (v3, flourish gaya pasar sendiri). */
+.win-confetti { position: absolute; inset: 0; pointer-events: none; }
+.wc { position: absolute; font-size: 30px; animation: confettiFloat 3s ease-in-out infinite alternate; }
+.wc.w1 { left: 16%; top: 22%; } .wc.w2 { left: 78%; top: 16%; animation-delay: .5s; }
+.wc.w3 { left: 86%; top: 44%; animation-delay: 1s; font-size: 24px; } .wc.w4 { left: 10%; top: 48%; animation-delay: 1.4s; color: #F2B705; }
+.wc.w5 { left: 68%; top: 66%; animation-delay: .8s; } .wc.w6 { left: 24%; top: 70%; animation-delay: 1.8s; font-size: 24px; }
+.wc.w7 { left: 46%; top: 8%; animation-delay: .3s; color: #fff; } .wc.w8 { left: 56%; top: 76%; animation-delay: 2.1s; }
+/* Tambahan v3 (polish): isi ruang kosong di tepi — jauh dari kartu statistik
+   tengah dan tombol, supaya layar menang terasa meriah tanpa menutupi apa pun. */
+.wc.w9 { left: 4%; top: 30%; animation-delay: .2s; font-size: 26px; }
+.wc.w10 { left: 90%; top: 28%; animation-delay: 1.1s; color: #F2B705; }
+.wc.w11 { left: 32%; top: 12%; animation-delay: 1.6s; font-size: 26px; }
+.wc.w12 { left: 62%; top: 88%; animation-delay: .7s; font-size: 24px; }
+.wc.w13 { left: 8%; top: 82%; animation-delay: 1.9s; color: #fff; }
+.wc.w14 { left: 94%; top: 68%; animation-delay: .4s; font-size: 26px; }
+@keyframes confettiFloat { from { transform: translateY(-8px) rotate(-6deg); } to { transform: translateY(8px) rotate(6deg); } }
 .loss-lanterns { position: absolute; top: 20px; left: 0; right: 0; display: flex; justify-content: space-around; font-size: 40px; opacity: .3; }

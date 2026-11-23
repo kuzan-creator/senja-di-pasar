@@ -1,7 +1,8 @@
 // hand.js — Logika tangan: main kartu, cek biaya, giliran, tangan penuh.
 // Bekerja di atas state.js / combos.js / deck.js. Tanpa DOM.
 
-import { computeBonuses } from './combos.js';
+import { computeBonuses, wheelBeats } from './combos.js';
+import { makeMerchant, resolveMerchantAttacks, MAX_MERCHANTS } from './merchants.js';
 import { BASE_COINS } from './state.js';
 import { drawFromDeck, discardRandom } from './deck.js';
 import { applyDamageTo, healSide, senjaTerakhirActive, MAX_HAND, addLog } from './state.js';
@@ -35,6 +36,9 @@ export function startTurn(state, sideName) {
     me.life = Math.max(0, me.life - 1);
     messages.push('Kelelahan −1 Reputasi');
   }
+  // Pedagang Tetap (v3): yang sudah di meja menyerang otomatis di awal
+  // giliran — yang baru dipanggil giliran lalu kini sudah siap.
+  messages.push(...resolveMerchantAttacks(state, sideName));
   while (me.hand.length > MAX_HAND) {
     const extra = me.hand.pop();
     me.discard.push(extra);
@@ -62,6 +66,10 @@ export function playCard(state, sideName, uid) {
   if (idx < 0) return { ok: false, reason: 'not-in-hand' };
   const card = me.hand[idx];
   if (card.cost > me.coins) return { ok: false, reason: 'no-coins' };
+  // Pedagang Tetap (v3): meja penuh (3) — kartu Pedagang tidak bisa dipanggil.
+  if (card.merchant && me.merchants.length >= MAX_MERCHANTS) {
+    return { ok: false, reason: 'board-full' };
+  }
 
   me.hand.splice(idx, 1);
   me.coins -= card.cost;
@@ -77,6 +85,25 @@ export function playCard(state, sideName, uid) {
 
   const events = [];
   const messages = [];
+
+  // Pedagang Tetap (v3): bonus kombo menjadi Serang/Darah permanen, bukan
+  // damage sekali-pakai — Resonansi/Rantai +Serang, perisai/heal +Darah,
+  // Roda Senja +3 Serang. Draw Pasar Ramai tetap jalan lewat jalur normal.
+  let merchantSummon = null;
+  if (card.merchant) {
+    merchantSummon = makeMerchant(card);
+    merchantSummon.atk += bonuses.bonusDmg;
+    if (lastFoeCard && wheelBeats(card.suit, lastFoeCard.suit)) {
+      merchantSummon.atk += 3;
+      bonuses.banners.push('RODA SENJA! +3 SERANG');
+    }
+    const hpBonus = bonuses.bonusShield + bonuses.bonusHeal;
+    merchantSummon.hp += hpBonus;
+    merchantSummon.maxHp += hpBonus;
+    bonuses.bonusDmg = 0;
+    bonuses.bonusShield = 0;
+    bonuses.bonusHeal = 0;
+  }
 
   // Hancurkan Terpal lawan (Roda Senja / Ombak Pasar) sebelum damage.
   if (bonuses.breakShield > 0 && foe.shield > 0) {
@@ -150,6 +177,14 @@ export function playCard(state, sideName, uid) {
   }
   if (card.id === 'panen-raya') me.panenUsed = true;
   if (bonuses.pasarRamai) me.pasarRamaiDone = true;
+
+  // Pedagang Tetap (v3): menetap di meja (objek sendiri — kartu yang
+  // dimainkan tetap masuk played/discard seperti biasa di akhir giliran).
+  if (merchantSummon) {
+    me.merchants.push(merchantSummon);
+    events.push({ type: 'summon', amount: merchantSummon.atk, target: sideName });
+    messages.push(card.name + ' dipanggil ke meja (Serang ' + merchantSummon.atk + ', Darah ' + merchantSummon.hp + ')');
+  }
 
   // Catat kartu yang dimainkan (untuk kombo + kartu terakhir di meja).
   me.played.push({ card, cost: card.cost });

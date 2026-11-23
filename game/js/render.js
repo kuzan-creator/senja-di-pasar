@@ -4,6 +4,7 @@
 import { suitById } from './cards.js';
 import { LAYOUT, rectStyle } from './table.js';
 import { starsFor } from './state.js';
+import { MAX_MERCHANTS } from './merchants.js';
 
 function el(id) {
   return document.getElementById(id);
@@ -36,7 +37,7 @@ export function cardElement(card, opts) {
   if (o.onClick) div.addEventListener('click', o.onClick);
   if (o.rotate || o.selected) {
     const rot = o.rotate ? 'rotate(' + o.rotate + 'deg)' : '';
-    const lift = o.selected ? ' translateY(-12px)' : '';
+    const lift = o.selected ? ' translateY(-8px)' : '';
     div.style.transform = (rot + lift).trim();
   }
   return div;
@@ -48,6 +49,34 @@ function cardBackElement() {
   div.className = 'card-back';
   div.innerHTML = '<span class="back-moon">🌙</span><span class="back-text">SENJA</span>';
   return div;
+}
+
+// Baris Pedagang Tetap (v3): ubin horizontal — emoji + nama singkat +
+// Serang/Darah besar, warna tepi mengikuti suit. Label opsional di atas.
+function renderMerchants(container, merchants, label) {
+  if (!container) return;
+  container.innerHTML = '';
+  if (label) {
+    const lab = document.createElement('div');
+    lab.className = 'merchant-label';
+    lab.textContent = label;
+    container.appendChild(lab);
+  }
+  const tiles = document.createElement('div');
+  tiles.className = 'merchant-tiles';
+  for (const m of merchants) {
+    const suit = suitById(m.suit);
+    const tile = document.createElement('div');
+    tile.className = 'merchant-tile' + (m.ready ? '' : ' merchant-sleeping');
+    tile.style.setProperty('--suit', suit.color);
+    tile.title = m.name + ' — Serang ' + m.atk + ', Darah ' + m.hp + (m.ready ? '' : ' (baru dipanggil, belum menyerang)');
+    tile.innerHTML =
+      '<span class="mt-emoji">' + m.emoji + '</span>' +
+      '<span class="mt-name">' + m.short + '</span>' +
+      '<span class="mt-stats"><b class="mt-atk">⚔ ' + m.atk + '</b><b class="mt-hp">♥ ' + m.hp + '</b></span>';
+    tiles.appendChild(tile);
+  }
+  container.appendChild(tiles);
 }
 
 function sideInfo(sideEl, name, stall, life, shield, isEnemy) {
@@ -131,6 +160,10 @@ function renderTable(state, hooks) {
     for (let i = 0; i < shown; i++) eh.appendChild(cardBackElement());
   }
 
+  // Baris Pedagang Tetap (v3) — ubin kecil: nama singkat + Serang/Darah besar.
+  renderMerchants(el('enemy-merchants'), e.merchants, 'PEDAGANG JURAGAN');
+  renderMerchants(el('player-merchants'), p.merchants, '');
+
   // Intent lawan.
   const intentBox = el('intent-badge');
   if (intentBox) {
@@ -203,9 +236,18 @@ function renderTable(state, hooks) {
     }
   }
 
-  // Log terakhir.
+  // Log terakhir — 3 baris, yang terbaru paling bawah dan paling terang.
   const log = el('log-line');
-  if (log) log.textContent = state.log.length ? state.log[state.log.length - 1] : '';
+  if (log) {
+    log.innerHTML = '';
+    const lines = state.log.slice(-3);
+    lines.forEach((line, i) => {
+      const row = document.createElement('div');
+      row.className = 'log-row' + (i < lines.length - 1 ? ' log-old' : '');
+      row.textContent = line;
+      log.appendChild(row);
+    });
+  }
 
   // Tangan pemain (kipas 5 kartu).
   const hand = el('player-hand');
@@ -213,8 +255,11 @@ function renderTable(state, hooks) {
     hand.innerHTML = '';
     const n = p.hand.length;
     p.hand.forEach((card, i) => {
-      const rotate = n > 1 ? (i - (n - 1) / 2) * 3 : 0;
-      const playable = card.cost <= p.coins && state.phase === 'player';
+      // Kipas 2°/kartu (dulu 3°): ujung kartu yang miring tidak lagi
+      // menutupi baris terakhir log di atas tangan.
+      const rotate = n > 1 ? (i - (n - 1) / 2) * 2 : 0;
+      const boardFull = !!card.merchant && p.merchants.length >= MAX_MERCHANTS;
+      const playable = card.cost <= p.coins && state.phase === 'player' && !boardFull;
       const resonance = p.played.some((pl) => pl.card.suit === card.suit);
       const chain = p.played.length > 0 && card.cost === p.played[p.played.length - 1].cost + 1;
       const cardEl = cardElement(card, {

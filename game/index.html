@@ -17,14 +17,52 @@
     <h1 class="game-title">SENJA DI PASAR</h1>
     <p class="game-subtitle">Duel Lapak Terakhir — The Last Stall Duel</p>
     <p class="game-tagline">“Dua lapak, satu senja. Habiskan Reputasi lawan sebelum lampumu padam.”</p>
-    <button id="btn-start" class="btn btn-gold btn-big">▶ MULAI BERDAGANG</button>
-    <button id="btn-howto" class="btn btn-white">CARA MAIN / HOW TO PLAY</button>
-    <div id="howto-panel" class="howto hidden">
-      <p><b>Tujuan:</b> Habiskan Reputasi Juragan Bara (30) sebelum Reputasimu habis.</p>
-      <p><b>Giliran:</b> 5 Koin Senja per giliran. Klik kartu untuk memilih, klik lagi / Enter untuk memainkan. Spasi = Tutup Lapak.</p>
-      <p><b>Kombo:</b> 2 kartu suit sama = Resonansi • biaya berurutan = Rantai Senja • 3 suit beda = Pasar Ramai • suit mengalahkan suit lawan = Roda Senja +3.</p>
-      <p><b>Intent:</b> baca lencana merah di atas meja — itulah yang akan dilakukan lawan di gilirannya.</p>
-      <p><b>Keyboard:</b> 1–8 pilih kartu • Enter main • Spasi tutup lapak • M bisu • R main lagi.</p>
+    <button id="btn-start" class="btn btn-gold btn-big">▶ MULAI DUEL</button>
+    <div class="title-menu">
+      <button id="btn-collection" class="btn btn-white">📚 KOLEKSI</button>
+      <button id="btn-howto" class="btn btn-white">CARA MAIN / HOW TO PLAY</button>
+      <button id="btn-settings" class="btn btn-white">⚙ PENGATURAN</button>
+    </div>
+    <div id="howto-panel" class="title-overlay hidden">
+      <div class="overlay-box">
+        <h2 class="overlay-title">CARA MAIN</h2>
+        <div class="howto-text">
+          <p><b>Tujuan:</b> Habiskan Reputasi Juragan Bara (50) sebelum Reputasimu habis.</p>
+          <p><b>Giliran:</b> 4 Koin Senja per giliran. Klik kartu untuk memilih, klik lagi / Enter untuk memainkan. Spasi = Tutup Lapak.</p>
+          <p><b>Pedagang Tetap:</b> kartu Pedagang menetap di meja (maks 3 per pihak), menyerang otomatis tiap giliran, dan baru dipanggil tidak menyerang di giliran itu. Pedagang menyerang Pedagang lawan yang paling kuat; kalau tidak ada, ia menyerang Reputasi lawan.</p>
+          <p><b>Kombo:</b> 2 kartu suit sama = Resonansi • biaya berurutan = Rantai Senja • 3 suit beda = Pasar Ramai • suit mengalahkan suit lawan = Roda Senja +3.</p>
+          <p><b>Intent:</b> baca lencana merah di atas meja — itulah yang akan dilakukan lawan di gilirannya.</p>
+          <p><b>Keyboard:</b> 1–8 pilih kartu • Enter main • Spasi tutup lapak • M bisu • R main lagi • Esc tutup panel.</p>
+        </div>
+        <button id="btn-close-howto" class="btn btn-gold">← KEMBALI</button>
+      </div>
+    </div>
+    <div id="collection-panel" class="title-overlay hidden">
+      <div class="overlay-box overlay-wide">
+        <h2 class="overlay-title">📚 KOLEKSI KARTU</h2>
+        <p class="overlay-sub">Deck 36 kartu: 28 unik + 8 duplikat (ditandai ×2). Klik kartu untuk melihat detailnya.</p>
+        <div id="col-filters" class="col-filters"></div>
+        <div class="col-body">
+          <div id="col-grid" class="col-grid"></div>
+          <div id="col-detail" class="col-detail"><p class="col-detail-empty">Pilih kartu di kiri untuk melihat detailnya.</p></div>
+        </div>
+        <button id="btn-close-collection" class="btn btn-gold">← KEMBALI</button>
+      </div>
+    </div>
+    <div id="settings-panel" class="title-overlay hidden">
+      <div class="overlay-box">
+        <h2 class="overlay-title">⚙ PENGATURAN</h2>
+        <div class="set-row">
+          <span>Suara (tombol M)</span>
+          <button id="btn-mute-setting" class="btn btn-white">🔊 SUARA: NYALA</button>
+        </div>
+        <div class="howto-text">
+          <p><b>Keyboard:</b> 1–8 pilih kartu • Enter mainkan • Spasi tutup lapak • M bisu • R main lagi • Esc tutup panel ini.</p>
+          <p><b>Mouse:</b> klik kartu untuk memilih, klik lagi (atau klik meja tengah) untuk memainkan. Klik Pedagang di tangan saat meja penuh tidak bisa dimainkan.</p>
+          <p>Game berjalan offline di browser desktop, tanpa network.</p>
+        </div>
+        <button id="btn-close-settings" class="btn btn-gold">← KEMBALI</button>
+      </div>
     </div>
     <div id="title-cards" class="title-cards" aria-label="Contoh kartu"></div>
     <div class="wheel-mini title-wheel">
@@ -53,6 +91,8 @@
     <div id="enemy-hand" class="enemy-hand"></div>
     <div id="enemy-hand-count" class="enemy-hand-count">Kartu lawan: 5</div>
 
+    <div id="enemy-merchants" class="merchant-row enemy-merchants"></div>
+
     <div id="round-label" class="round-label">PUTARAN 1</div>
     <div id="turn-label" class="turn-label">GILIRANMU — mainkan kartumu</div>
 
@@ -76,6 +116,7 @@
     </div>
     <div id="combo-banner" class="combo-banner" style="display:none"></div>
     <div id="floating-damage" class="floating-damage" style="display:none"></div>
+    <div id="player-merchants" class="merchant-row player-merchants"></div>
     <div id="log-line" class="log-line"></div>
 
     <div id="deck-pile" class="pile deck-pile">
@@ -115,6 +156,14 @@
     <div id="win-fireworks" class="fireworks" aria-hidden="true">
       <span class="fw f1">✦</span><span class="fw f2">✦</span><span class="fw f3">✦</span>
       <span class="fw f4">✦</span><span class="fw f5">✦</span><span class="fw f6">✦</span>
+    </div>
+    <div class="win-confetti" aria-hidden="true">
+      <span class="wc w1">🪙</span><span class="wc w2">🏮</span><span class="wc w3">🪙</span>
+      <span class="wc w4">✦</span><span class="wc w5">🏮</span><span class="wc w6">🪙</span>
+      <span class="wc w7">✦</span><span class="wc w8">🏮</span>
+      <span class="wc w9">🪙</span><span class="wc w10">✦</span>
+      <span class="wc w11">🏮</span><span class="wc w12">🪙</span>
+      <span class="wc w13">✦</span><span class="wc w14">🏮</span>
     </div>
     <h1 class="end-title win-title">LAPAKMU MENANG!</h1>
     <p class="end-sub">🏆 SARI MENANG</p>

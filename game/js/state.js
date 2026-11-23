@@ -18,6 +18,7 @@ export function freshSide() {
     hand: [],
     deck: [],
     discard: [],
+    merchants: [], // Pedagang Tetap di meja (v3): {uid, defId, name, short, suit, atk, hp, maxHp, ready}
     played: [],
     coinsSpent: 0,
     firstAttackDone: false,

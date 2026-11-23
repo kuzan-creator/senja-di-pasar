@@ -3,6 +3,9 @@
 // files, no network); the screenshots live in screenshots/. This program's
 // only job is to hand both over: copy them into the grader's output folder
 // and write dossier.json there, built with the kit's vendored library.
+// v3: game/ includes Pedagang Tetap (game/js/merchants.js) and the title
+// menus (Koleksi / Cara Main / Pengaturan); screenshots are 2 JPG + 2 PNG
+// because the 1280x800 table/title shots exceed 256 KiB as PNG.
 //
 // Outside the grader, MAKEFUN_OUTPUT_DIR stands in for /output:
 //   mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
