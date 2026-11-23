@@ -310,9 +310,9 @@ body[data-shot="table"] .floating-damage { animation: none; opacity: 1; transfor
 }
 .deck-pile { left: 24px; top: 530px; }
 .discard-pile { left: 1146px; top: 530px; }
-.pile-cards { font-size: 30px; }
+.pile-cards { font-size: 26px; }
 .pile-label { font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #D8C8E8; }
-.pile-count { font-size: 26px; font-weight: 900; color: #fff; }
+.pile-count { font-size: 24px; font-weight: 900; color: #fff; line-height: 1; }
 
 .senja-badge {
   position: absolute; left: 370px; top: 648px;
@@ -380,7 +380,7 @@ body[data-shot="table"] .floating-damage { animation: none; opacity: 1; transfor
 .card-icon { position: absolute; top: 14px; right: 10px; width: 34px; height: 34px; }
 .card-icon svg { width: 100%; height: 100%; }
 .card-name {
-  margin-top: 44px; padding: 0 8px;
+  margin-top: 50px; padding: 0 8px;
   font-size: 20px; font-weight: 900; line-height: 1.05; text-align: center;
 }
 .card-en { text-align: center; font-size: 11px; font-weight: 800; color: #7A4A21; letter-spacing: .5px; margin-top: 2px; }
@@ -413,7 +413,10 @@ body[data-shot="table"] .floating-damage { animation: none; opacity: 1; transfor
 .title-cards .card:hover { transform: none; }
 .title-cards .card:nth-child(1):hover { transform: rotate(-6deg); }
 .title-cards .card:nth-child(3):hover { transform: rotate(6deg); }
-.title-cards .card-name { font-size: 17px; margin-top: 38px; }
+.title-cards .card-name { font-size: 17px; margin-top: 42px; }
+/* Lingkaran biaya kartu contoh lebih kecil + lebih ke pojok supaya tidak
+   menyentuh nama kartu (v3.1: lingkaran 36px menumpang "Panen Raya" 4px). */
+.title-cards .card-cost { top: 12px; left: 8px; width: 30px; height: 30px; font-size: 18px; }
 .title-cards .card-big { font-size: 22px; bottom: 50px; }
 .title-cards .card-text { font-size: 11px; }
 
