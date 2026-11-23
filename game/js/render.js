@@ -131,8 +131,11 @@ function renderTable(state, hooks) {
   const p = state.player;
   const e = state.enemy;
 
-  set('round-label', 'PUTARAN ' + state.round);
-  set('turn-label', state.phase === 'player' ? 'GILIRANMU — mainkan kartumu' : state.phase === 'enemy' ? 'GILIRAN JURAGAN BARA…' : '');
+  // v3.1: indikator giliran digabung ke baris putaran (satu baris,
+  // "PUTARAN 6 • GILIRANMU") — .turn-label disembunyikan di CSS supaya
+  // tidak menumpuk badge intent / kartu tengah / panel Roda Senja.
+  set('round-label', 'PUTARAN ' + state.round + (state.phase === 'player' ? ' • GILIRANMU' : state.phase === 'enemy' ? ' • GILIRAN JURAGAN' : ''));
+  set('turn-label', '');
 
   sideInfo(el('enemy-info'), 'Juragan Bara', 'Lapak Bara Membara', e.life, e.shield, true);
   sideInfo(el('player-info'), 'Sari', 'Lapak Sari Senja', p.life, p.shield, false);
